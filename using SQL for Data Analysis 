@@ -1,0 +1,70 @@
+import sqlite3
+
+con = sqlite3.connect("ecommerce.db")
+cur = con.cursor()
+
+# Create Table
+cur.execute("""CREATE TABLE IF NOT EXISTS sales(
+id INTEGER PRIMARY KEY,
+name TEXT,
+city TEXT,
+product TEXT,
+price INTEGER)""")
+
+# Insert Data
+cur.execute("DELETE FROM sales")
+
+cur.executemany("INSERT INTO sales VALUES(?,?,?,?,?)", [
+(1,"Ayesha","Hyderabad","Laptop",50000),
+(2,"Rahul","Karimnagar","Mobile",20000),
+(3,"Sara","Siddipet","Laptop",45000),
+(4,"Arjun","Warangal","Mobile",15000),
+(5,"Priya","Hyderabad","Tablet",10000)
+])
+
+con.commit()
+
+# SELECT
+print("\nALL RECORDS")
+cur.execute("SELECT * FROM sales")
+print(*cur.fetchall(), sep="\n")
+
+# WHERE
+print("\nWHERE")
+cur.execute("SELECT * FROM sales WHERE price > 20000")
+print(cur.fetchall())
+
+# ORDER BY
+print("\nORDER BY")
+cur.execute("SELECT * FROM sales ORDER BY price DESC")
+print(cur.fetchall())
+
+# GROUP BY and SUM
+print("\nGROUP BY")
+cur.execute("SELECT city, SUM(price) FROM sales GROUP BY city")
+print(cur.fetchall())
+
+# AVG
+print("\nAVERAGE")
+cur.execute("SELECT AVG(price) FROM sales")
+print(cur.fetchone())
+
+# SUBQUERY
+print("\nSUBQUERY")
+cur.execute("SELECT * FROM sales WHERE price > (SELECT AVG(price) FROM sales)")
+print(cur.fetchall())
+
+# VIEW
+cur.execute("""CREATE VIEW IF NOT EXISTS sales_view AS
+SELECT name, product, price FROM sales""")
+
+print("\nVIEW")
+cur.execute("SELECT * FROM sales_view")
+print(cur.fetchall())
+
+# INDEX
+cur.execute("CREATE INDEX IF NOT EXISTS idx_city ON sales(city)")
+
+print("\nTASK 3 COMPLETED!")
+
+con.close()
